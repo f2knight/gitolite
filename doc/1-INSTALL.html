@@ -63,12 +63,28 @@
 <p>Please make sure you understand the following points first.</p>
 
 <ul>
-<li><p>gitolite runs as a single user on a server, and is invoked via ssh.  Thus,
-every user on the server is a potential "gitolite host".</p></li>
-<li><p>gitolite depends <strong>heavily</strong> on ssh pubkey (passwordless) access.  Do not
-assume you know all about ssh -- most people <strong>don't</strong>.  If in doubt, use
-a dedicated userid on both client and server for installation and
-administration of gitolite.</p>
+<li><p>gitolite runs as a single (real) user on a server, and is invoked via ssh.
+Traditionally, this "hosting user" is "git" or "gitolite".</p>
+
+<ul>
+<li>there is <em>usually</em> only one hosting user per server (machine), but
+gitolite makes it trivial to have as many as you want.  In fact, every
+user on the server is a potential hosting user.  Advanced users can
+look <a href="http://sitaramc.github.com/gitolite/doc/1-INSTALL.html#_special_cases_multiple_gitolite_servers">here</a>!)</li>
+</ul></li>
+<li><p>using this single user and sshd (or httpd) authentication, gitolite allows
+you to create any number of "virtual" users.  Virtual user names only mean
+something to gitolite, and they need not be the same as any real userid on
+the server or any of the clients accessing it.</p>
+
+<ul>
+<li>the first such virtual user is the "admin user", created during the
+install sequence.</li>
+</ul></li>
+<li><p>gitolite, in its most commonly used form, depends <strong>heavily</strong> on ssh
+pubkey (passwordless) access.  Do not assume you know all about ssh --
+most people <strong>don't</strong>.  If in doubt, use a dedicated userid on both client
+and server for installation and administration of gitolite.</p>
 
 <p>To make matters worse, ssh problems in gitolite don't always look like ssh
 problems.  See <a href="http://sitaramc.github.com/gitolite/doc/ssh-troubleshooting.html">doc/ssh-troubleshooting.mkd</a> for help.</p></li>
@@ -78,15 +94,12 @@ fiddle with files and directories it controls.</p>
 <p>Apparently this was not obvious to some people.</p></li>
 </ul>
 
-<p>A gitolite setup has:</p>
+<p>Thus a bare minimum gitolite setup has:</p>
 
 <ul>
 <li>a server</li>
-<li>a "hosting user" on the server -- the userid under which gitolite runs.
-(Side note: there is <em>usually</em> only one hosting user per server (machine),
-but gitolite makes it trivial to have as many as you want.  Advanced users
-can look <a href="http://sitaramc.github.com/gitolite/doc/1-INSTALL.html#_special_cases_multiple_gitolite_servers">here</a>!)</li>
-<li>an "admin user" -- the user who sets up gitolite and configures it</li>
+<li>a real "hosting user" on the server -- usually "git" or "gitolite"</li>
+<li>a virtual "admin user" -- the user who sets up gitolite and configures it.</li>
 <li>the admin user's client or workstation, from which he does all his work</li>
 </ul>
 
@@ -259,13 +272,14 @@ cd gitolite-source
 mkdir -p /usr/local/share/gitolite/conf /usr/local/share/gitolite/hooks
 src/gl-system-install /usr/local/bin /usr/local/share/gitolite/conf /usr/local/share/gitolite/hooks
 </code></pre></li>
-<li><p>on the server, "su - git", then as "git" user, run <code>which gl-setup</code>.  This
-should respond with <code>/usr/local/bin/gl-setup</code>.  If this is not what you
-get, you have some <code>$PATH</code> issues.  Make sure <code>/usr/local/bin</code> is in the
-<code>$PATH</code> for the git user, and that no prior components of the path contain
-another copy of <code>gl-setup</code>.  You <em>must</em> run the one in the directory that
-is the first argument of <code>gl-system-install</code> above.</p></li>
-<li><p>now run <code>gl-setup /tmp/YourName.pub</code>.</p></li>
+<li><p>on the server, as root, run "su - git", then as "git" user, run <code>which
+gl-setup</code>.  This should respond with <code>/usr/local/bin/gl-setup</code>.  If this
+is not what you get, you have some <code>$PATH</code> issues.  Make sure
+<code>/usr/local/bin</code> is in the <code>$PATH</code> for the git user, and that no prior
+components of the path contain another copy of <code>gl-setup</code>.  You <em>must</em> run
+the one in the directory that is the first argument of <code>gl-system-install</code>
+above.</p></li>
+<li><p>on the server, still as "git", run <code>gl-setup /tmp/YourName.pub</code>.</p></li>
 <li><p>on the client, run <code>cd; git clone git@server:gitolite-admin</code></p></li>
 </ul>
 
@@ -282,8 +296,8 @@ to handle multiple keys in ssh.</strong></p>
 <ul>
 <li><p>from your workstation, copy your <code>~/.ssh/id_rsa.pub</code> file to the server.
 Put it in <code>/tmp/YourName.pub</code>.</p></li>
-<li><p>if <code>$HOME/bin</code> is not on the default PATH, fiddle with your <code>.bashrc</code> or
-<code>.bash_profile</code> or similar files and add it somehow.</p></li>
+<li><p>if <code>$HOME/bin</code> is not on the default PATH for the "git" user, fiddle with
+the <code>.bashrc</code> or <code>.bash_profile</code> or similar files and add it somehow.</p></li>
 <li><p>(U) on the server, as "git", do the following:</p>
 
 <pre><code>cd $HOME

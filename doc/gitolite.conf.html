@@ -97,6 +97,16 @@ include them in the main file for convenience.</p>
 the main config file.  You can also use an absolute path if you like, although
 in the interests of cloning the admin-repo sanely you should avoid doing this!</p>
 
+<p>You can also use a glob, as in:</p>
+
+<pre><code>include     "*.conf"
+</code></pre>
+
+<p>which will include all the ".conf" files from the directory in which the main
+config file exists.</p>
+
+<p>Files that have been already processed once are skipped, with a warning.</p>
+
 <p>[Advanced users: the include statement cannot be used inside a delegated
 config file, for security reasons].</p>
 
@@ -417,7 +427,7 @@ use <a href="http://sitaramc.github.com/gitolite/contrib/gerrit.html">Gerrit Cod
 implementation of git which has been tweaked to allow this.  There are some
 complications in how it does it; see that link for more.</p>
 
-<p>However, now we've managed to do that to.  And without having to hack git!
+<p>However, now we've managed to do that too.  And without having to hack git!
 The idea came to me while working on <a href="http://sitaramc.github.com/gitolite/contrib/adc/hub.html">something else</a> for the KDE folks,
 so you can thank them for the inspiration.</p>
 
@@ -508,6 +518,13 @@ don't worry that this causes some duplication or inefficiency.  It doesn't :-)</
 <p>Elsewhere in the file, you would specify access for individual repos (like RW,
 RW+, etc).  Gitolite combines all of these access rules, maintaining the
 textual order in which they occur, when authorising a push.</p>
+
+<p>And although this example used groups, you can use reponames as well, or mix
+and match them.  You can even distribute rulesets across multiple "include"
+files if you wish.</p>
+
+<p>Just remember that if you use <a href="http://sitaramc.github.com/gitolite/doc/gitolite.conf.html#_deny_rules">deny rules</a> anywhere then the <em>order of the
+rules matters</em>!</p>
 
 <p>This feature also helps people who generate their gitolite.conf itself from
 some <em>other</em> database -- it allows them much more flexibility in how they
